@@ -1,0 +1,32 @@
+{
+	"$schema": "https://json.schemastore.org/nest-cli",
+	"collection": "@nestjs/schematics",
+	"sourceRoot": "apps/cozy-corner-api/src",
+	"compilerOptions": {
+		"deleteOutDir": true,
+		"webpack": true,
+		"tsConfigPath": "apps/cozy-corner-api/tsconfig.app.json"
+	},
+	"monorepo": true,
+	"root": "apps/cozy-corner-api",
+	"projects": {
+		"cozy-corner-api-api": {
+			"type": "application",
+			"root": "apps/cozy-corner-api",
+			"entryFile": "main",
+			"sourceRoot": "apps/cozy-corner-api/src",
+			"compilerOptions": {
+				"tsConfigPath": "apps/cozy-corner-api/tsconfig.app.json"
+			}
+		},
+		"cozy-corner-batch": {
+			"type": "application",
+			"root": "apps/cozy-corner-batch",
+			"entryFile": "main",
+			"sourceRoot": "apps/cozy-corner-batch/src",
+			"compilerOptions": {
+				"tsConfigPath": "apps/cozy-corner-batch/tsconfig.app.json"
+			}
+		}
+	}
+}
