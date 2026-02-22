@@ -1,31 +1,31 @@
 {
 	"$schema": "https://json.schemastore.org/nest-cli",
 	"collection": "@nestjs/schematics",
-	"sourceRoot": "apps/cozy-corner-api/src",
+	"sourceRoot": "apps/shop-corner-api/src",
 	"compilerOptions": {
 		"deleteOutDir": true,
 		"webpack": true,
-		"tsConfigPath": "apps/cozy-corner-api/tsconfig.app.json"
+		"tsConfigPath": "apps/shop-corner-api/tsconfig.app.json"
 	},
 	"monorepo": true,
-	"root": "apps/cozy-corner-api",
+	"root": "apps/shop-corner-api",
 	"projects": {
-		"cozy-corner-api-api": {
+		"shop-corner-api-api": {
 			"type": "application",
-			"root": "apps/cozy-corner-api",
+			"root": "apps/shop-corner-api",
 			"entryFile": "main",
-			"sourceRoot": "apps/cozy-corner-api/src",
+			"sourceRoot": "apps/shop-corner-api/src",
 			"compilerOptions": {
-				"tsConfigPath": "apps/cozy-corner-api/tsconfig.app.json"
+				"tsConfigPath": "apps/shop-corner-api/tsconfig.app.json"
 			}
 		},
-		"cozy-corner-batch": {
+		"shop-corner-batch": {
 			"type": "application",
-			"root": "apps/cozy-corner-batch",
+			"root": "apps/shop-corner-batch",
 			"entryFile": "main",
-			"sourceRoot": "apps/cozy-corner-batch/src",
+			"sourceRoot": "apps/shop-corner-batch/src",
 			"compilerOptions": {
-				"tsConfigPath": "apps/cozy-corner-batch/tsconfig.app.json"
+				"tsConfigPath": "apps/shop-corner-batch/tsconfig.app.json"
 			}
 		}
 	}
