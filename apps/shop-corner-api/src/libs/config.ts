@@ -13,6 +13,36 @@ export const shapeIntoMongooseObjectId = (target: any) => {
 	return typeof target === 'string' ? new ObjectId(target) : target;
 };
 
+// Sort Options
+
 export const memberSortOptions = ['createdAt', 'updatedAt', 'memberLikes', 'memberViews'];
 export const boardArticleSortOptions = ['createdAt', 'updatedAt', 'articleLikes', 'articleViews'];
 export const commentSortOptions = ['createdAt', 'updatedAt'];
+export const productSortOptions = [
+	'createdAt',
+	'updatedAt',
+	'productLikes',
+	'productViews',
+	'productRank',
+	'productPrice',
+];
+
+// Lookup logics
+
+export const lookupVisit = {
+	$lookup: {
+		from: 'members',
+		localField: 'visitedProduct.memberId',
+		foreignField: '_id',
+		as: 'visitedProduct.memberData',
+	},
+};
+
+export const lookupFavorite = {
+	$lookup: {
+		from: 'members',
+		localField: 'favoriteProduct.memberId',
+		foreignField: '_id',
+		as: 'favoriteProduct.memberData',
+	},
+};
