@@ -9,6 +9,11 @@ import { productSortOptions } from '../../config';
 export class ProductInput {
 	@IsNotEmpty()
 	@Length(3, 100)
+	@Field(() => ProductStatus)
+	productStatus: ProductStatus;
+
+	@IsNotEmpty()
+	@Length(3, 100)
 	@Field(() => String)
 	productName: string;
 
@@ -34,12 +39,12 @@ export class ProductInput {
 	productSalePrice?: number;
 
 	@IsNotEmpty()
-	@Field(() => ProductSize)
-	productSize: ProductSize;
+	@Field(() => [ProductSize])
+	productSize: ProductSize[];
 
 	@IsNotEmpty()
-	@Field(() => String)
-	productColor: string;
+	@Field(() => [String])
+	productColor: string[];
 
 	@IsOptional()
 	@Field(() => String, { nullable: true })
@@ -64,8 +69,6 @@ export class ProductInput {
 	@IsNotEmpty()
 	@Field(() => Boolean)
 	isDiscounted: boolean;
-
-	memberId: ObjectId;
 }
 
 @InputType()
@@ -79,10 +82,6 @@ export class PricesRange {
 
 @InputType()
 export class PISearch {
-	@IsOptional()
-	@Field(() => String, { nullable: true })
-	memberId?: ObjectId;
-
 	@IsOptional()
 	@Field(() => [ProductCategory], { nullable: true })
 	categoryList?: ProductCategory[];

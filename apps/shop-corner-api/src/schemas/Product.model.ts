@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { ProductCategory, ProductDressStyle, ProductSize, ProductStatus } from '../libs/enums/product.enum';
 
 const ProductSchema = new Schema(
@@ -7,7 +7,6 @@ const ProductSchema = new Schema(
 			type: String,
 			enum: ProductStatus,
 			default: ProductStatus.DRAFT,
-			index: true,
 			required: true,
 		},
 
@@ -34,14 +33,12 @@ const ProductSchema = new Schema(
 			type: String,
 			enum: ProductCategory,
 			required: true,
-			index: true,
 		},
 
 		productDressStyle: {
 			type: String,
 			enum: ProductDressStyle,
 			required: true,
-			index: true,
 		},
 
 		productPrice: {
@@ -56,17 +53,14 @@ const ProductSchema = new Schema(
 		},
 
 		productSize: {
-			type: String,
+			type: [String],
 			enum: ProductSize,
 			required: true,
-			index: true,
 		},
 
 		productColor: {
-			type: String,
+			type: [String],
 			required: true,
-			trim: true,
-			index: true,
 		},
 
 		productMaterial: {
@@ -78,7 +72,6 @@ const ProductSchema = new Schema(
 			type: String,
 			required: true,
 			trim: true,
-			index: true,
 		},
 
 		productImages: {
@@ -117,16 +110,14 @@ const ProductSchema = new Schema(
 			min: 0,
 		},
 
-		productsTags: {
+		productTags: {
 			type: [String],
 			default: [],
-			index: true,
 		},
 
 		isDiscounted: {
 			type: Boolean,
 			default: false,
-			index: true,
 		},
 	},
 	{ timestamps: true },
@@ -134,13 +125,13 @@ const ProductSchema = new Schema(
 
 /* INDEXES */
 
-// Unique product slug
+// Unique slug
 ProductSchema.index({ productSlug: 1 }, { unique: true });
 
-// Prevent duplicates in same category
+// Prevent duplicate product names per category
 ProductSchema.index({ productName: 1, productCategory: 1 }, { unique: true });
 
-// Shop filters
+// Common filters
 ProductSchema.index({ productCategory: 1, productStatus: 1 });
 ProductSchema.index({ productDressStyle: 1 });
 ProductSchema.index({ productSize: 1 });

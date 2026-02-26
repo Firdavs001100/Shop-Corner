@@ -1,6 +1,6 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import type { ObjectId } from 'mongoose';
-import { Member, TotalCounter } from '../member/member';
+import { TotalCounter } from '../member/member';
 import { MeLiked } from '../like/like';
 import { ProductCategory, ProductDressStyle, ProductSize, ProductStatus } from '../../enums/product.enum';
 
@@ -33,11 +33,11 @@ export class Product {
 	@Field(() => Float, { nullable: true })
 	productSalePrice?: number;
 
-	@Field(() => ProductSize)
-	productSize: ProductSize;
+	@Field(() => [ProductSize])
+	productSize: ProductSize[];
 
-	@Field(() => String)
-	productColor: string;
+	@Field(() => [String])
+	productColor: string[];
 
 	@Field(() => String, { nullable: true })
 	productMaterial?: string;
@@ -76,9 +76,6 @@ export class Product {
 	updatedAt: Date;
 
 	/** from aggregation **/
-
-	@Field(() => Member, { nullable: true })
-	memberData?: Member;
 
 	@Field(() => [MeLiked], { nullable: true })
 	meLiked?: MeLiked[];

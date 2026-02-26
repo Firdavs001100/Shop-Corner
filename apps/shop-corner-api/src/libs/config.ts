@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import { T } from './types/common';
 
-export const validMimeTypes = ['image/png', 'image/jpg', 'image/jpeg'];
+export const validMimeTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/webp'];
 export const getSerialForImage = (filename: string) => {
 	const ext = path.parse(filename).ext;
 	return uuidv4() + ext;
@@ -29,20 +29,33 @@ export const productSortOptions = [
 
 // Lookup logics
 
-export const lookupVisit = {
-	$lookup: {
-		from: 'members',
-		localField: 'visitedProduct.memberId',
-		foreignField: '_id',
-		as: 'visitedProduct.memberData',
-	},
-};
-
-export const lookupFavorite = {
-	$lookup: {
-		from: 'members',
-		localField: 'favoriteProduct.memberId',
-		foreignField: '_id',
-		as: 'favoriteProduct.memberData',
-	},
+export const lookupAuthMemberLiked = (memberId: T, targetRefId: string = '$_id') => {
+	return {
+		$lookup: {
+			from: 'likes',
+			let: {
+				localMemberId: memberId,
+				localLikeRefId: targetRefId,
+				localMyFavorite: true,
+			},
+			pipeline: [
+				{
+					$match: {
+						$expr: {
+							$and: [{ $eq: ['$memberId', '$$localMemberId'] }, { $eq: ['$likeRefId', '$$localLikeRefId'] }],
+						},
+					},
+				},
+				{
+					$project: {
+						_id: 0,
+						memberId: 1,
+						likeRefId: 1,
+						myFavorite: '$$localMyFavorite',
+					},
+				},
+			],
+			as: 'meLiked',
+		},
+	};
 };

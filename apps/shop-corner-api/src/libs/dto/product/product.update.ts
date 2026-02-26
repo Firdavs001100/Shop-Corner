@@ -17,6 +17,8 @@ export class ProductUpdate {
 	@Field(() => String, { nullable: true })
 	productName?: string;
 
+	productSlug?: string;
+
 	@IsOptional()
 	@Length(5, 1000)
 	@Field(() => String, { nullable: true })
@@ -41,13 +43,13 @@ export class ProductUpdate {
 	productSalePrice?: number;
 
 	@IsOptional()
-	@Field(() => ProductSize, { nullable: true })
-	productSize?: ProductSize;
+	@Field(() => [ProductSize], { nullable: true })
+	productSize?: ProductSize[];
 
 	@IsOptional()
 	@Length(2, 50)
-	@Field(() => String, { nullable: true })
-	productColor?: string;
+	@Field(() => [String], { nullable: true })
+	productColor?: string[];
 
 	@IsOptional()
 	@Length(2, 50)

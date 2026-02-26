@@ -5,7 +5,6 @@ import { View } from '../../libs/dto/view/view';
 import { ViewInput } from '../../libs/dto/view/view.input';
 import { T } from '../../libs/types/common';
 import { ViewGroup } from '../../libs/enums/view.enum';
-import { lookupVisit } from '../../libs/config';
 import { OrdinaryInquiry } from '../../libs/dto/product/product.input';
 import { Products } from '../../libs/dto/product/product';
 
@@ -33,26 +32,26 @@ export class ViewService {
 		const { page, limit } = input,
 			match: T = { memberId, viewGroup: ViewGroup.PRODUCT };
 
-		const data: T = await this.viewModel
+		const data = await this.viewModel
 				.aggregate([
 					{ $match: match },
 					{ $sort: { updatedAt: -1 } },
-					{
-						$lookup: {
-							from: 'products',
-							localField: 'viewRefId',
-							foreignField: '_id',
-							as: 'visitedProduct',
-						},
-					},
-					{ $unwind: '$visitedProduct' },
+
 					{
 						$facet: {
 							list: [
 								{ $skip: (page - 1) * limit },
-								{ $limit: limit }, //
-								lookupVisit,
-								{ $unwind: '$visitedProduct.memberData' },
+								{ $limit: limit },
+
+								{
+									$lookup: {
+										from: 'products',
+										localField: 'viewRefId',
+										foreignField: '_id',
+										as: 'visitedProduct',
+									},
+								},
+								{ $unwind: '$visitedProduct' },
 							],
 							metaCounter: [{ $count: 'total' }],
 						},
@@ -60,7 +59,7 @@ export class ViewService {
 				])
 				.exec(),
 			result: Products = { list: [], metaCounter: data[0].metaCounter };
-		result.list = data[0].list.map((ele: any) => ele.visitedProperty);
+		result.list = data[0].list.map((ele: any) => ele.visitedProduct);
 
 		return result;
 	}
