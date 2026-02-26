@@ -21,8 +21,8 @@ export class BoardArticle {
 	@Field(() => String)
 	articleContent: string;
 
-	@Field(() => String, { nullable: true })
-	articleImage?: string;
+	@Field(() => [String], { nullable: true })
+	articleImage?: string[];
 
 	@Field(() => Int)
 	articleViews: number;

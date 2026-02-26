@@ -24,6 +24,6 @@ export class BoardArticleUpdate {
 	articleContent?: string;
 
 	@IsOptional()
-	@Field(() => String, { nullable: true })
-	articleImage?: string;
+	@Field(() => [String], { nullable: true })
+	articleImage?: string[];
 }

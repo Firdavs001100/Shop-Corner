@@ -98,6 +98,11 @@ const ProductSchema = new Schema(
 			min: 0,
 		},
 
+		productComments: {
+			type: Number,
+			default: 0,
+		},
+
 		productRank: {
 			type: Number,
 			default: 0,

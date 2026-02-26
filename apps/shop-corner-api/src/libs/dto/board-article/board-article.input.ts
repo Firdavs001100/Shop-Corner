@@ -22,8 +22,8 @@ export class BoardArticleInput {
 	articleContent: string;
 
 	@IsOptional()
-	@Field(() => String, { nullable: true })
-	articleImage?: string;
+	@Field(() => [String], { nullable: true })
+	articleImage?: string[];
 
 	memberId?: ObjectId;
 }
