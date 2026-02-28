@@ -13,27 +13,24 @@ import { Products } from '../../libs/dto/product/product';
 export class LikeService {
 	constructor(@InjectModel('Like') private readonly likeModel: Model<Like>) {}
 
-	public async toggleLike(input: LikeInput): Promise<number> {
-		const { memberId, likeRefId } = input,
-			search = { memberId, likeRefId },
-			exist = await this.likeModel.findOne(search).exec();
+	public async toggleLike(input: LikeInput): Promise<{ modifier: number; isLiked: boolean }> {
+		const { memberId, likeRefId } = input;
+		const search = { memberId, likeRefId };
 
-		let modifier = 1;
+		const exist = await this.likeModel.findOne(search).exec();
 
 		if (exist) {
 			await this.likeModel.findOneAndDelete(search).exec();
-			modifier = -1;
-		} else {
-			try {
-				await this.likeModel.create(input);
-			} catch (err) {
-				console.log('ERROR, Service.model:', err.message);
-				throw new BadRequestException(Message.CREATE_FAILED);
-			}
+			return { modifier: -1, isLiked: false };
 		}
 
-		console.log(`== LIKE MODIFIER: ${modifier} ==`);
-		return modifier;
+		try {
+			await this.likeModel.create(input);
+			return { modifier: 1, isLiked: true };
+		} catch (err) {
+			console.log('ERROR, Service.model:', err.message);
+			throw new BadRequestException(Message.CREATE_FAILED);
+		}
 	}
 
 	public async checkLikeExistance(input: LikeInput): Promise<MeLiked[]> {

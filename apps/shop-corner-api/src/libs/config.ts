@@ -15,6 +15,7 @@ export const shapeIntoMongooseObjectId = (target: any) => {
 
 // Sort Options
 
+export const notificationSortOptions = ['createdAt', 'updatedAt'];
 export const noticeSortOptions = ['createdAt', 'updatedAt'];
 export const memberSortOptions = ['createdAt', 'updatedAt', 'memberLikes', 'memberViews'];
 export const boardArticleSortOptions = ['createdAt', 'updatedAt', 'articleLikes', 'articleViews'];

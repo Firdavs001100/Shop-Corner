@@ -7,6 +7,7 @@ import { MemberModule } from '../member/member.module';
 import { BoardArticleModule } from '../board-article/board-article.module';
 import { ProductModule } from '../product/product.module';
 import CommentSchema from '../../schemas/Comment.model';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
 	imports: [
@@ -15,6 +16,7 @@ import CommentSchema from '../../schemas/Comment.model';
 		MemberModule,
 		ProductModule,
 		BoardArticleModule,
+		NotificationModule,
 	],
 	providers: [CommentResolver, CommentService],
 	exports: [CommentService],

@@ -12,7 +12,7 @@ const NotificationSchema = new Schema(
 		notificationStatus: {
 			type: String,
 			enum: NotificationStatus,
-			default: NotificationStatus.WAIT,
+			default: NotificationStatus.UNREAD,
 		},
 
 		notificationGroup: {
@@ -54,5 +54,8 @@ const NotificationSchema = new Schema(
 	},
 	{ timestamps: true, collection: 'notifications' },
 );
+
+NotificationSchema.index({ receiverId: 1, notificationStatus: 1, createdAt: -1 });
+NotificationSchema.index({ receiverId: 1, createdAt: -1 });
 
 export default NotificationSchema;

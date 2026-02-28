@@ -19,6 +19,9 @@ import { lookupAuthMemberLiked, lookupMember, shapeIntoMongooseObjectId } from '
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { LikeService } from '../like/like.service';
+import { NotificationInput } from '../../libs/dto/notification/notification.input';
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class BoardArticleService {
@@ -27,6 +30,7 @@ export class BoardArticleService {
 		private readonly memberService: MemberService,
 		private readonly viewService: ViewService,
 		private readonly likeService: LikeService,
+		private readonly notificationService: NotificationService,
 	) {}
 
 	// USER
@@ -106,9 +110,23 @@ export class BoardArticleService {
 		};
 
 		// like toggle logic via like service model
-		const modifier: number = await this.likeService.toggleLike(input),
+		const { modifier, isLiked } = await this.likeService.toggleLike(input),
 			result = await this.boardArticleStatsEditor({ _id: likeRefId, targetKey: 'articleLikes', modifier });
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+
+		const notificationInput: NotificationInput = {
+			notificationType: NotificationType.LIKE,
+			notificationGroup: NotificationGroup.ARTICLE,
+			notificationTitle: 'Someone liked your article',
+			notificationDesc: `Someone liked your article: "${target.articleTitle}".`,
+			authorId: memberId,
+			receiverId: target.memberId,
+			articleId: target._id,
+		};
+
+		// create notification via notification service model
+		if (isLiked) await this.notificationService.createNotification(notificationInput);
+		else await this.notificationService.deleteLikeNotification(memberId, likeRefId, NotificationGroup.ARTICLE);
 
 		return result;
 	}

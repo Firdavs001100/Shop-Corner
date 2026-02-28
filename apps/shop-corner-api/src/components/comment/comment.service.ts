@@ -12,6 +12,8 @@ import { T } from '../../libs/types/common';
 import { lookupAuthMemberLiked, lookupMember } from '../../libs/config';
 import { Direction } from '../../libs/enums/common.enum';
 import { ProductService } from '../product/product.service';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
 
 @Injectable()
 export class CommentService {
@@ -20,6 +22,7 @@ export class CommentService {
 		private readonly memberService: MemberService,
 		private readonly productService: ProductService,
 		private readonly boardArticleService: BoardArticleService,
+		private readonly notificationService: NotificationService,
 	) {}
 
 	// USER
@@ -28,34 +31,68 @@ export class CommentService {
 		try {
 			result = await this.commentModel.create(input);
 		} catch (err) {
-			console.log('Error, boardArticles.service.ts--createComment:', err);
+			console.log('Error, comment.service.ts--createComment:', err);
 			throw new BadRequestException(Message.CREATE_FAILED);
 		}
 
+		if (!result) throw new BadRequestException(Message.CREATE_FAILED);
+
 		switch (input.commentGroup) {
-			case CommentGroup.MEMBER:
+			case CommentGroup.MEMBER: {
 				await this.memberService.memberStatsEditor({
 					_id: input.commentRefId,
 					targetKey: 'memberComments',
 					modifier: 1,
 				});
 
-			case CommentGroup.ARTICLE:
+				const targetMember = await this.memberService.getMember(null, input.commentRefId);
+
+				await this.notificationService.createNotification({
+					notificationType: NotificationType.COMMENT,
+					notificationGroup: NotificationGroup.MEMBER,
+					notificationTitle: 'New comment on your profile',
+					notificationDesc: `${targetMember.memberNick} commented on your profile`,
+					authorId: input.memberId,
+					receiverId: targetMember._id,
+				});
+
+				break;
+			}
+
+			case CommentGroup.ARTICLE: {
 				await this.boardArticleService.boardArticleStatsEditor({
 					_id: input.commentRefId,
 					targetKey: 'articleComments',
 					modifier: 1,
 				});
 
-			case CommentGroup.PRODUCT:
+				const article = await this.boardArticleService.getBoardArticle(null, input.commentRefId);
+
+				if (article.memberId.toString() !== input.memberId.toString()) {
+					await this.notificationService.createNotification({
+						notificationType: NotificationType.COMMENT,
+						notificationGroup: NotificationGroup.ARTICLE,
+						notificationTitle: 'New comment on your article',
+						notificationDesc: `Someone commented on your article: "${article.articleTitle}"`,
+						authorId: input.memberId,
+						receiverId: article.memberId,
+						articleId: article._id,
+					});
+				}
+
+				break;
+			}
+
+			case CommentGroup.PRODUCT: {
 				await this.productService.productStatsEditor({
 					_id: input.commentRefId,
 					targetKey: 'productComments',
 					modifier: 1,
 				});
+				break;
+			}
 		}
 
-		if (!result) throw new BadRequestException(Message.CREATE_FAILED);
 		return result;
 	}
 

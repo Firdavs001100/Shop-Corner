@@ -15,6 +15,9 @@ import { LikeService } from '../like/like.service';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { Follower, Following, MeFollowed } from '../../libs/dto/follow/follow';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationInput } from '../../libs/dto/notification/notification.input';
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
 
 @Injectable()
 export class MemberService {
@@ -24,6 +27,7 @@ export class MemberService {
 		private readonly authService: AuthService,
 		private readonly viewService: ViewService,
 		private readonly likeService: LikeService,
+		private readonly notificationService: NotificationService,
 	) {}
 
 	public async signup(input: MemberInput): Promise<Member> {
@@ -116,9 +120,22 @@ export class MemberService {
 		};
 
 		// like toggle logic via like service model
-		const modifier: number = await this.likeService.toggleLike(input),
+		const { modifier, isLiked } = await this.likeService.toggleLike(input),
 			result = await this.memberStatsEditor({ _id: likeRefId, targetKey: 'memberLikes', modifier });
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+
+		const notificationInput: NotificationInput = {
+			notificationType: NotificationType.LIKE,
+			notificationGroup: NotificationGroup.MEMBER,
+			notificationTitle: 'Someone liked your profile',
+			notificationDesc: `${target.memberNick} liked your profile.`,
+			authorId: memberId,
+			receiverId: likeRefId,
+		};
+
+		// create notification via notification service model
+		if (isLiked) await this.notificationService.createNotification(notificationInput);
+		else await this.notificationService.deleteLikeNotification(memberId, likeRefId, NotificationGroup.MEMBER);
 
 		return result;
 	}

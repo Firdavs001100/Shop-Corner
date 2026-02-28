@@ -121,7 +121,7 @@ export class ProductService {
 		};
 
 		// like toggle logic via like service model
-		const modifier: number = await this.likeService.toggleLike(input),
+		const { modifier } = await this.likeService.toggleLike(input),
 			result = await this.productStatsEditor({ _id: likeRefId, targetKey: 'productLikes', modifier });
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
 
@@ -199,7 +199,7 @@ export class ProductService {
 	}
 
 	public async removeProductByAdmin(productId: ObjectId): Promise<Product> {
-		const result = await this.productModel.findOneAndDelete({_id: productId}).exec();
+		const result = await this.productModel.findOneAndDelete({ _id: productId }).exec();
 		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
 
 		return result;
