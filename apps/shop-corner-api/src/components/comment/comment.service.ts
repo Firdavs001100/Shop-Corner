@@ -47,14 +47,16 @@ export class CommentService {
 
 				const targetMember = await this.memberService.getMember(null, input.commentRefId);
 
-				await this.notificationService.createNotification({
-					notificationType: NotificationType.COMMENT,
-					notificationGroup: NotificationGroup.MEMBER,
-					notificationTitle: 'New comment on your profile',
-					notificationDesc: `${targetMember.memberNick} commented on your profile`,
-					authorId: input.memberId,
-					receiverId: targetMember._id,
-				});
+				if (targetMember._id.toString() !== input.memberId.toString()) {
+					await this.notificationService.createNotification({
+						notificationType: NotificationType.COMMENT,
+						notificationGroup: NotificationGroup.MEMBER,
+						notificationTitle: 'New comment on your profile',
+						notificationDesc: `${targetMember.memberNick} commented on your profile`,
+						authorId: input.memberId,
+						receiverId: targetMember._id,
+					});
+				}
 
 				break;
 			}

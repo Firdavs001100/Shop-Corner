@@ -125,8 +125,9 @@ export class BoardArticleService {
 		};
 
 		// create notification via notification service model
-		if (isLiked) await this.notificationService.createNotification(notificationInput);
-		else await this.notificationService.deleteLikeNotification(memberId, likeRefId, NotificationGroup.ARTICLE);
+		if (isLiked && target.memberId.toString() !== memberId.toString())
+			await this.notificationService.createNotification(notificationInput);
+		if (!isLiked) await this.notificationService.deleteLikeNotification(memberId, likeRefId, NotificationGroup.ARTICLE);
 
 		return result;
 	}

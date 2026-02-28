@@ -111,6 +111,7 @@ export class MemberService {
 
 	public async likeTargetMember(memberId: ObjectId, likeRefId: ObjectId): Promise<Member> {
 		const target: Member = await this.memberModel.findOne({ _id: likeRefId, memberStatus: MemberStatus.ACTIVE }).exec();
+
 		if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		const input: LikeInput = {
@@ -120,22 +121,34 @@ export class MemberService {
 		};
 
 		// like toggle logic via like service model
-		const { modifier, isLiked } = await this.likeService.toggleLike(input),
-			result = await this.memberStatsEditor({ _id: likeRefId, targetKey: 'memberLikes', modifier });
+		const { modifier, isLiked } = await this.likeService.toggleLike(input);
+
+		const result = await this.memberStatsEditor({
+			_id: likeRefId,
+			targetKey: 'memberLikes',
+			modifier,
+		});
+
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
 
-		const notificationInput: NotificationInput = {
-			notificationType: NotificationType.LIKE,
-			notificationGroup: NotificationGroup.MEMBER,
-			notificationTitle: 'Someone liked your profile',
-			notificationDesc: `${target.memberNick} liked your profile.`,
-			authorId: memberId,
-			receiverId: likeRefId,
-		};
-
 		// create notification via notification service model
-		if (isLiked) await this.notificationService.createNotification(notificationInput);
-		else await this.notificationService.deleteLikeNotification(memberId, likeRefId, NotificationGroup.MEMBER);
+		if (isLiked && memberId.toString() !== likeRefId.toString()) {
+			const author = await this.memberModel.findById(memberId).exec();
+			if (!author) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+			await this.notificationService.createNotification({
+				notificationType: NotificationType.LIKE,
+				notificationGroup: NotificationGroup.MEMBER,
+				notificationTitle: 'Someone liked your profile',
+				notificationDesc: `${author.memberNick} liked your profile.`,
+				authorId: memberId,
+				receiverId: likeRefId,
+			});
+		}
+
+		if (!isLiked) {
+			await this.notificationService.deleteLikeNotification(memberId, likeRefId, NotificationGroup.MEMBER);
+		}
 
 		return result;
 	}
