@@ -21,6 +21,7 @@ import {
 } from '../../libs/dto/product/product.input';
 import { ProductUpdate } from '../../libs/dto/product/product.update';
 import slugify from 'slugify';
+import { OrderItem } from '../../libs/dto/order/order';
 
 @Injectable()
 export class ProductService {
@@ -151,7 +152,7 @@ export class ProductService {
 
 			return result;
 		} catch (err) {
-			console.log('Error, property.service.ts--createProductByAdmin:', err);
+			console.log('Error, product.service.ts--createProductByAdmin:', err);
 			throw new BadRequestException(Message.CREATE_FAILED);
 		}
 	}
@@ -208,5 +209,28 @@ export class ProductService {
 	public async productStatsEditor(input: StatisticModifier): Promise<Product> {
 		const { _id, targetKey, modifier } = input;
 		return await this.productModel.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true }).exec();
+	}
+
+	public async updateProductOrderStats(orderItems: OrderItem[]): Promise<void> {
+		const ops = orderItems.map((item) => ({
+			updateOne: {
+				filter: {
+					_id: item.productId,
+					productStockCount: { $gte: item.itemQuantity },
+				},
+				update: {
+					$inc: {
+						productSales: item.itemQuantity,
+						productStockCount: -item.itemQuantity,
+					},
+				},
+			},
+		}));
+
+		const result = await this.productModel.bulkWrite(ops);
+
+		if (result.modifiedCount !== orderItems.length) {
+			throw new BadRequestException('Some products are out of stock');
+		}
 	}
 }

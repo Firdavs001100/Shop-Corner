@@ -33,6 +33,11 @@ export enum Message {
 	REMOVE_FAILED = 'Remove is failed!',
 	SELF_SUBSCRIBTION_DENIED = 'You cannot subscribe to yourself.',
 	BAD_REQUEST = 'Something went wrong with your request.',
+
+	NO_ITEM_FOUND = 'Order must contain at least one item',
+	INVALID_STATUS_CHANGE = 'Invalid order status change.',
+	PAYMENT_REQUIRED = 'Payment is required before this order can be shipped.',
+	NO_SHIPPING_ADDRESS = 'No shipping address found for this member',
 }
 
 class Errors extends Error {

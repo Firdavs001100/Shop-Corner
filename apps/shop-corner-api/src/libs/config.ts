@@ -15,6 +15,7 @@ export const shapeIntoMongooseObjectId = (target: any) => {
 
 // Sort Options
 
+export const orderSortOptions = ['createdAt', 'updatedAt'];
 export const notificationSortOptions = ['createdAt', 'updatedAt'];
 export const noticeSortOptions = ['createdAt', 'updatedAt'];
 export const memberSortOptions = ['createdAt', 'updatedAt', 'memberLikes', 'memberViews'];
@@ -30,6 +31,23 @@ export const productSortOptions = [
 ];
 
 // Lookup logics
+export const lookupOrderItems = {
+	$lookup: {
+		from: 'orderItems',
+		localField: '_id',
+		foreignField: 'orderId',
+		as: 'orderItems',
+	},
+};
+
+export const lookupProductData = {
+	$lookup: {
+		from: 'products',
+		localField: 'orderItems.productId',
+		foreignField: '_id',
+		as: 'productData',
+	},
+};
 
 export const lookupMember = {
 	$lookup: {

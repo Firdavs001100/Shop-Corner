@@ -16,7 +16,6 @@ import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { Follower, Following, MeFollowed } from '../../libs/dto/follow/follow';
 import { NotificationService } from '../notification/notification.service';
-import { NotificationInput } from '../../libs/dto/notification/notification.input';
 import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
 
 @Injectable()
