@@ -56,9 +56,12 @@ export class OrderResolver {
 	@Roles(MemberType.ADMIN)
 	@UseGuards(RolesGuard)
 	@Mutation(() => Order)
-	public async updateOrderByAdmin(@Args('input') input: OrderUpdate): Promise<Order> {
+	public async updateOrderByAdmin(
+		@Args('input') input: OrderUpdate,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Order> {
 		console.log('Mutation: updateOrderByAdmin');
 
-		return await this.orderService.updateOrderByAdmin(input);
+		return await this.orderService.updateOrderByAdmin(memberId, input);
 	}
 }

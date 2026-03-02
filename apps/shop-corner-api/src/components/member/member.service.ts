@@ -3,7 +3,7 @@ import { LoginInput, MemberInput, MembersInquiry } from '../../libs/dto/member/m
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Member, Members } from '../../libs/dto/member/member';
-import { MemberStatus } from '../../libs/enums/member.enum';
+import { MemberStatus, MemberType } from '../../libs/enums/member.enum';
 import { Message } from '../../libs/Errors';
 import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
@@ -191,5 +191,11 @@ export class MemberService {
 	public async memberStatsEditor(input: StatisticModifier): Promise<Member> {
 		const { _id, targetKey, modifier } = input;
 		return await this.memberModel.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true }).exec();
+	}
+
+	public async getAdminId(): Promise<ObjectId> {
+		const admin = await this.memberModel.findOne({ memberType: MemberType.ADMIN }).exec();
+
+		return admin._id;
 	}
 }

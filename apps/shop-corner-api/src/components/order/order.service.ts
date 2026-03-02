@@ -11,6 +11,8 @@ import { OrderPaymentStatus, OrderStatus } from '../../libs/enums/order.enum';
 import { T } from '../../libs/types/common';
 import { Direction } from '../../libs/enums/common.enum';
 import { OrderUpdate } from '../../libs/dto/order/order.update';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
 
 @Injectable()
 export class OrderService {
@@ -19,6 +21,7 @@ export class OrderService {
 		@InjectModel('OrderItem') private readonly orderItemModel: Model<OrderItem>,
 		private readonly productService: ProductService,
 		private readonly memberService: MemberService,
+		private readonly notificationService: NotificationService,
 	) {}
 
 	// USER
@@ -151,6 +154,7 @@ export class OrderService {
 			throw new BadRequestException(Message.INVALID_STATUS_CHANGE);
 		}
 
+		const prevPaymentStatus = order.orderPaymentStatus;
 		const prevStatus = order.orderStatus;
 
 		// User can cancel (before shipping)
@@ -175,6 +179,31 @@ export class OrderService {
 		}
 
 		await order.save();
+
+		// Notify the user
+		const adminId = await this.memberService.getAdminId();
+
+		if (prevPaymentStatus !== OrderPaymentStatus.PAID && order.orderPaymentStatus === OrderPaymentStatus.PAID) {
+			await this.notificationService.createNotification({
+				notificationType: NotificationType.ORDER,
+				notificationGroup: NotificationGroup.MEMBER,
+				notificationTitle: 'Payment successful 💳',
+				notificationDesc: `Your payment for order #${order._id.toString()} was successful.`,
+				authorId: adminId,
+				receiverId: memberId,
+			});
+		}
+
+		if (prevStatus !== order.orderStatus && order.orderStatus === OrderStatus.CANCELLED) {
+			await this.notificationService.createNotification({
+				notificationType: NotificationType.ORDER,
+				notificationGroup: NotificationGroup.MEMBER,
+				notificationTitle: 'Order cancelled',
+				notificationDesc: `Your order #${order._id.toString()} has been cancelled.`,
+				authorId: adminId,
+				receiverId: memberId,
+			});
+		}
 
 		/* Points added only once */
 		/* Registering the sales for that product */
@@ -223,7 +252,7 @@ export class OrderService {
 		return result[0];
 	}
 
-	public async updateOrderByAdmin(input: OrderUpdate): Promise<Order> {
+	public async updateOrderByAdmin(memberId: ObjectId, input: OrderUpdate): Promise<Order> {
 		const orderId = shapeIntoMongooseObjectId(input._id);
 
 		const order = await this.orderModel.findOne({
@@ -237,34 +266,64 @@ export class OrderService {
 			throw new BadRequestException(Message.INVALID_STATUS_CHANGE);
 		}
 
-		if (input.orderStatus === OrderStatus.SHIPPED && order.orderPaymentStatus !== OrderPaymentStatus.PAID) {
-			throw new BadRequestException(Message.PAYMENT_REQUIRED);
-		}
-
 		const allowedTransitions: Record<OrderStatus, OrderStatus[]> = {
-			PENDING: [OrderStatus.PAID, OrderStatus.CANCELLED],
-			PAID: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
-			SHIPPED: [OrderStatus.DELIVERED],
-			DELIVERED: [],
-			CANCELLED: [],
-			DELETE: [],
+			[OrderStatus.PENDING]: [OrderStatus.PAID, OrderStatus.CANCELLED],
+			[OrderStatus.PAID]: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
+			[OrderStatus.SHIPPED]: [OrderStatus.DELIVERED],
+			[OrderStatus.DELIVERED]: [],
+			[OrderStatus.CANCELLED]: [],
+			[OrderStatus.DELETE]: [],
 		};
 
+		const prevStatus = order.orderStatus;
+
+		// Status change
 		if (input.orderStatus) {
 			const allowed = allowedTransitions[order.orderStatus] || [];
 			if (!allowed.includes(input.orderStatus)) {
 				throw new BadRequestException(Message.INVALID_STATUS_CHANGE);
 			}
+
+			// Shipping only after payment
+			if (input.orderStatus === OrderStatus.SHIPPED && order.orderPaymentStatus !== OrderPaymentStatus.PAID) {
+				throw new BadRequestException(Message.PAYMENT_REQUIRED);
+			}
+
 			order.orderStatus = input.orderStatus;
 		}
 
+		// Payment change
 		if (input.orderPaymentStatus) {
+			if (
+				order.orderPaymentStatus === OrderPaymentStatus.PAID &&
+				input.orderPaymentStatus === OrderPaymentStatus.PAID
+			) {
+				throw new BadRequestException(Message.INVALID_STATUS_CHANGE);
+			}
+
 			order.orderPaymentStatus = input.orderPaymentStatus;
+
+			// Sync orderStatus with payment
+			if (input.orderPaymentStatus === OrderPaymentStatus.PAID && order.orderStatus === OrderStatus.PENDING) {
+				order.orderStatus = OrderStatus.PAID;
+			}
 		}
 
-		const prevStatus = order.orderStatus;
 		await order.save();
 
+		// User notification (only when status changed)
+		if (prevStatus !== order.orderStatus) {
+			await this.notificationService.createNotification({
+				notificationType: NotificationType.ORDER,
+				notificationGroup: NotificationGroup.MEMBER,
+				notificationTitle: `Order ${order.orderStatus}`,
+				notificationDesc: this.buildOrderMessage(order.orderStatus, order._id),
+				authorId: memberId,
+				receiverId: order.memberId,
+			});
+		}
+
+		// Points + product stats only once when delivered
 		if (prevStatus !== OrderStatus.DELIVERED && order.orderStatus === OrderStatus.DELIVERED) {
 			await this.memberService.memberStatsEditor({
 				_id: order.memberId,
@@ -276,6 +335,21 @@ export class OrderService {
 			await this.productService.updateProductOrderStats(orderItems);
 		}
 
-		return this.orderModel.findById(order._id);
+		return order;
+	}
+
+	private buildOrderMessage(status: OrderStatus, orderId: ObjectId): string {
+		switch (status) {
+			case OrderStatus.PAID:
+				return `Your payment for order #${orderId} was confirmed.`;
+			case OrderStatus.SHIPPED:
+				return `Your order #${orderId} has been shipped.`;
+			case OrderStatus.DELIVERED:
+				return `Your order #${orderId} has been delivered.`;
+			case OrderStatus.CANCELLED:
+				return `Your order #${orderId} was cancelled by admin.`;
+			default:
+				return `Your order #${orderId} status changed to ${status}.`;
+		}
 	}
 }

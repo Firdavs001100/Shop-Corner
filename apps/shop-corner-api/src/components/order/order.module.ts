@@ -7,6 +7,7 @@ import OrderSchema from '../../schemas/Order.model';
 import OrderItemSchema from '../../schemas/OrderItem.model';
 import { MemberModule } from '../member/member.module';
 import { ProductModule } from '../product/product.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
 	imports: [
@@ -15,6 +16,7 @@ import { ProductModule } from '../product/product.module';
 		AuthModule,
 		ProductModule,
 		MemberModule,
+		NotificationModule,
 	],
 	providers: [OrderResolver, OrderService],
 	exports: [OrderService],
