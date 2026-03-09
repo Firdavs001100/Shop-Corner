@@ -96,9 +96,9 @@ export class ProductService {
 		if (colorList && colorList.length) match.productColor = { $in: colorList };
 		if (dressStyleList && dressStyleList.length) match.productDressStyle = { $in: dressStyleList };
 
-		if (pricesRange) match.propertyPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
+		if (pricesRange) match.productPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
 
-		if (text) match.propertyTitle = { $regex: new RegExp(text, 'i') };
+		if (text) match.productName = { $regex: new RegExp(text, 'i') };
 	}
 
 	public async getFavorites(memberId: ObjectId, input: OrdinaryInquiry): Promise<Products> {

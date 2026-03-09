@@ -28,6 +28,7 @@ export const productSortOptions = [
 	'productViews',
 	'productRank',
 	'productPrice',
+	'productSales',
 ];
 
 // Lookup logics

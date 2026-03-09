@@ -24,6 +24,12 @@ export class OrderItem {
 	@Field(() => Number)
 	itemQuantity: number;
 
+	@Field(() => String)
+	itemSize: string;
+
+	@Field(() => String)
+	itemColor: string;
+
 	@Field(() => Number)
 	itemPrice: number;
 

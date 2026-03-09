@@ -21,6 +21,16 @@ const OrderItemSchema = new Schema(
 			type: Number,
 			required: true,
 		},
+
+		itemSize: {
+			type: String,
+			required: true,
+		},
+
+		itemColor: {
+			type: String,
+			required: true,
+		},
 	},
 	{ timestamps: true, collection: 'orderItems' },
 );

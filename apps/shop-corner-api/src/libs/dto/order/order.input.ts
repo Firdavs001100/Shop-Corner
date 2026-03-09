@@ -13,6 +13,14 @@ export class OrderItemInput {
 
 	@IsNotEmpty()
 	@Field(() => String)
+	itemSize: string;
+
+	@IsNotEmpty()
+	@Field(() => String)
+	itemColor: string;
+
+	@IsNotEmpty()
+	@Field(() => String)
 	productId: ObjectId;
 
 	@IsOptional()

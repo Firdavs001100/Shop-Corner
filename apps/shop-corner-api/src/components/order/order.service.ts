@@ -59,7 +59,9 @@ export class OrderService {
 
 				preparedItems.push({
 					itemQuantity: item.itemQuantity,
+					itemSize: item.itemSize,
 					itemPrice: finalPrice,
+					itemColor: item.itemColor,
 					productId: shapeIntoMongooseObjectId(item.productId),
 				});
 			}
