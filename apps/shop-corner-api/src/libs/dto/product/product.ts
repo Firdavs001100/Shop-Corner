@@ -66,6 +66,9 @@ export class Product {
 	@Field(() => Int)
 	productSales: number;
 
+	@Field(() => Float)
+	productRating: number;
+
 	@Field(() => Boolean)
 	isDiscounted: boolean;
 

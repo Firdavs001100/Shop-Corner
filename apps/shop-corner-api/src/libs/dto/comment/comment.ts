@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import type { ObjectId } from 'mongoose';
 import { CommentGroup, CommentStatus } from '../../enums/comment.enum';
 import { Member, TotalCounter } from '../member/member';
@@ -20,6 +20,9 @@ export class Comment {
 
 	@Field(() => String)
 	commentRefId: ObjectId;
+
+	@Field(() => Int, { nullable: true })
+	commentRating?: number;
 
 	@Field(() => String)
 	memberId: ObjectId;

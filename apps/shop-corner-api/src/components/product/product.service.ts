@@ -233,4 +233,8 @@ export class ProductService {
 			throw new BadRequestException('Some products are out of stock');
 		}
 	}
+
+	public async updateProductRating(productId: ObjectId, rating: number): Promise<void> {
+		await this.productModel.findByIdAndUpdate(productId, { productRating: rating });
+	}
 }

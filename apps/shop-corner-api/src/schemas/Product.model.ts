@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import { ProductCategory, ProductDressStyle, ProductSize, ProductStatus } from '../libs/enums/product.enum';
+import { Float } from '@nestjs/graphql';
 
 const ProductSchema = new Schema(
 	{
@@ -110,6 +111,12 @@ const ProductSchema = new Schema(
 		},
 
 		productSales: {
+			type: Number,
+			default: 0,
+			min: 0,
+		},
+
+		productRating: {
 			type: Number,
 			default: 0,
 			min: 0,

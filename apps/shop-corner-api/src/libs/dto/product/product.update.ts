@@ -74,6 +74,12 @@ export class ProductUpdate {
 	productStockCount?: number;
 
 	@IsOptional()
+	@IsInt()
+	@Min(0)
+	@Field(() => Float)
+	productRating: number;
+
+	@IsOptional()
 	@IsArray()
 	@ArrayNotEmpty()
 	@Field(() => [String], { nullable: true })

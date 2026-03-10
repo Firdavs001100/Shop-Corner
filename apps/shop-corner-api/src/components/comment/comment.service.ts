@@ -91,6 +91,19 @@ export class CommentService {
 					targetKey: 'productComments',
 					modifier: 1,
 				});
+
+				const productComments = await this.commentModel
+					.find({
+						commentRefId: input.commentRefId,
+						commentGroup: CommentGroup.PRODUCT,
+					})
+					.select('commentRating');
+
+				const total = productComments.length;
+				const avg = total > 0 ? productComments.reduce((sum, c) => sum + (c.commentRating ?? 0), 0) / total : 0;
+
+				await this.productService.updateProductRating(input.commentRefId, parseFloat(avg.toFixed(1)));
+
 				break;
 			}
 		}

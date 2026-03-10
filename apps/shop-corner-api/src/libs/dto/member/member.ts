@@ -22,6 +22,9 @@ export class Member {
 	memberPhone: string;
 
 	@Field(() => String)
+	memberEmail: string;
+
+	@Field(() => String)
 	memberNick: string;
 
 	memberPassword?: string;

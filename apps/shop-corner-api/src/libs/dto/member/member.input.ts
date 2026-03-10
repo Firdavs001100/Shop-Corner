@@ -20,6 +20,10 @@ export class MemberInput {
 	@Field(() => String)
 	memberPhone: string;
 
+	@IsNotEmpty()
+	@Field(() => String)
+	memberEmail: string;
+
 	@IsOptional()
 	@Field(() => MemberType, { nullable: true })
 	memberType?: MemberType;
@@ -31,13 +35,13 @@ export class MemberInput {
 
 @InputType()
 export class LoginInput {
-	@IsNotEmpty()
-	@Length(3, 12)
+	@IsNotEmpty({ message: 'Nickname is required' })
+	@Length(3, 12, { message: 'Nickname must be 3–12 characters long' })
 	@Field(() => String)
 	memberNick: string;
 
-	@IsNotEmpty()
-	@Length(5, 12)
+	@IsNotEmpty({ message: 'Password is required' })
+	@Length(5, 12, { message: 'Password must be 5–12 characters long' })
 	@Field(() => String)
 	memberPassword: string;
 }
