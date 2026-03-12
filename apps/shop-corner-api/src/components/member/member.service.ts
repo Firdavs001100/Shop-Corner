@@ -98,6 +98,22 @@ export class MemberService {
 	}
 
 	public async updateMember(memberId: ObjectId, input: MemberUpdate): Promise<Member> {
+		if (input.memberNewPassword) {
+			const member = await this.memberModel.findById(memberId).select('+memberPassword').lean().exec();
+
+			if (!member) throw new InternalServerErrorException(Message.NO_MEMBER_NICK);
+
+			// compare CURRENT password
+			const isMatch = await this.authService.comparePasswords(input.memberPassword, member.memberPassword);
+
+			if (!isMatch) throw new InternalServerErrorException(Message.CURRENT_PASSWORD_MISMATCH);
+
+			// hash NEW password
+			input.memberPassword = await this.authService.hashPassword(input.memberNewPassword);
+		}
+
+		delete input.memberNewPassword;
+
 		const result = await this.memberModel
 			.findOneAndUpdate({ _id: memberId, memberStatus: MemberStatus.ACTIVE }, input, { new: true })
 			.exec();

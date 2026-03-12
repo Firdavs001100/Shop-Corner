@@ -25,6 +25,7 @@ export enum Message {
 	TOKEN_CREATION_FAILED = 'Token creation error!',
 	NO_MEMBER_NICK = 'No member was found with that nickname!',
 	WRONG_PASSWORD = 'Wrong password, please try again!',
+	CURRENT_PASSWORD_MISMATCH = 'The current password you entered is incorrect. Please try again.',
 	NOT_AUTHENTICATED = "You're not authenticated. Please login first",
 	BLOCKED_USER = 'You have been blocked. Please, contact the restaurant service!',
 	PROVIDE_ALLOWED_FORMAT = 'Please upload only allowed format types, such as jpeg, jpg and png',
