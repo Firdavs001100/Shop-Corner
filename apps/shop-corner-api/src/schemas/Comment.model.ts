@@ -37,4 +37,11 @@ const CommentSchema = new Schema(
 	{ timestamps: true, collection: 'comments' },
 );
 
+// Optimized compound index
+CommentSchema.index({
+	commentStatus: 1,
+	commentRating: 1,
+	createdAt: -1,
+});
+
 export default CommentSchema;

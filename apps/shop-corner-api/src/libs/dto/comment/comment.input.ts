@@ -59,3 +59,40 @@ export class CommentsInquiry {
 	@Field(() => CISearch)
 	search: CISearch;
 }
+
+@InputType()
+class ACISearch {
+	@IsOptional()
+	@Field(() => CommentGroup, { nullable: true })
+	commentGroup?: CommentGroup;
+
+	@IsOptional()
+	@Field(() => Int, { nullable: true })
+	commentRating?: number;
+}
+
+@InputType()
+export class AllCommentsInquiry {
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	page: number;
+
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	limit: number;
+
+	@IsOptional()
+	@IsIn(commentSortOptions)
+	@Field(() => String, { nullable: true })
+	sort?: string;
+
+	@IsOptional()
+	@Field(() => Direction, { nullable: true })
+	direction?: Direction;
+
+	@IsNotEmpty()
+	@Field(() => ACISearch)
+	search: ACISearch;
+}

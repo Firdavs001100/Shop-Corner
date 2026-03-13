@@ -4,7 +4,7 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { Comment, Comments } from '../../libs/dto/comment/comment';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
-import { CommentInput, CommentsInquiry } from '../../libs/dto/comment/comment.input';
+import { AllCommentsInquiry, CommentInput, CommentsInquiry } from '../../libs/dto/comment/comment.input';
 import type { ObjectId } from 'mongoose';
 import { CommentUpdate } from '../../libs/dto/comment/comment.update';
 import { shapeIntoMongooseObjectId } from '../../libs/config';
@@ -28,6 +28,17 @@ export class CommentResolver {
 		input.search.commentRefId = shapeIntoMongooseObjectId(input.search.commentRefId);
 
 		return await this.commentService.getComments(memberId, input);
+	}
+
+	@UseGuards(WithoutGuard)
+	@Query(() => Comments)
+	public async getAllComments(
+		@Args('input') input: AllCommentsInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Comments> {
+		console.log('Query: getComments');
+
+		return await this.commentService.getAllComments(memberId, input);
 	}
 
 	@UseGuards(AuthGuard)
