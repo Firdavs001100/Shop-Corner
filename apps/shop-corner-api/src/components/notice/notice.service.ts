@@ -26,6 +26,17 @@ export class NoticeService {
 		return targetNotice;
 	}
 
+	public async createNotice(input: NoticeInput): Promise<Notice> {
+		try {
+			const result = await this.noticeModel.create(input);
+
+			return result;
+		} catch (err) {
+			console.log('Error, notice.service.ts--createNotice:', err);
+			throw new BadRequestException(Message.CREATE_FAILED);
+		}
+	}
+
 	public async getNotices(input: NoticesInquiry): Promise<Notices> {
 		const { noticeCategory } = input.search,
 			match: T = { noticeStatus: NoticeStatus.ACTIVE },
@@ -82,7 +93,7 @@ export class NoticeService {
 
 			return result;
 		} catch (err) {
-			console.log('Error, notice.service.ts--createNotice:', err);
+			console.log('Error, notice.service.ts--createNoticeByAdmin:', err);
 			throw new BadRequestException(Message.CREATE_FAILED);
 		}
 	}

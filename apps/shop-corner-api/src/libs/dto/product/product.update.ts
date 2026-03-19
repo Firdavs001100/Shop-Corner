@@ -76,8 +76,8 @@ export class ProductUpdate {
 	@IsOptional()
 	@IsInt()
 	@Min(0)
-	@Field(() => Float)
-	productRating: number;
+	@Field(() => Float, {nullable: true})
+	productRating?: number;
 
 	@IsOptional()
 	@IsArray()

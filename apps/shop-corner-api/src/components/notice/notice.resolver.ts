@@ -25,6 +25,19 @@ export class NoticeResolver {
 		return await this.noticeService.getNotice(noticeId);
 	}
 
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Mutation(() => Notice)
+	public async createNotice(
+		@Args('input') input: NoticeInput,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Notice> {
+		console.log('Mutation: createNotice');
+		input.memberId = memberId;
+
+		return await this.noticeService.createNotice(input);
+	}
+
 	@UseGuards(WithoutGuard)
 	@Query(() => Notices)
 	public async getNotices(@Args('input') input: NoticesInquiry): Promise<Notices> {
@@ -50,7 +63,7 @@ export class NoticeResolver {
 		@Args('input') input: NoticeInput,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Notice> {
-		console.log('Mutation: createNotice');
+		console.log('Mutation: createNoticeByAdmin');
 		input.memberId = memberId;
 
 		return await this.noticeService.createNoticeByAdmin(input);

@@ -84,7 +84,7 @@ export class BoardArticleService {
 			search: T = {
 				_id,
 				memberId,
-				articleStatus: BoardArticleStatus.ACTIVE,
+				// articleStatus: BoardArticleStatus.ACTIVE,
 			};
 
 		const result = await this.boardArticleModel.findOneAndUpdate(search, input, { new: true }).exec();
@@ -201,7 +201,6 @@ export class BoardArticleService {
 		const { _id, articleStatus } = input,
 			search: T = {
 				_id,
-				articleStatus: BoardArticleStatus.ACTIVE,
 			};
 
 		const result = await this.boardArticleModel.findOneAndUpdate(search, input, { new: true }).exec();
