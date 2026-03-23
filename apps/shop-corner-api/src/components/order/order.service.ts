@@ -116,8 +116,8 @@ export class OrderService {
 			match: T = { memberId },
 			sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 
-		if (orderStatus) match.orderStatus = orderStatus;
-		if (orderPaymentStatus) match.orderPaymentStatus = orderPaymentStatus;
+		if (orderStatus) match.orderStatus = { $in: orderStatus };
+		if (orderPaymentStatus) match.orderPaymentStatus = { $in: orderPaymentStatus };
 
 		const result = await this.orderModel
 			.aggregate([
@@ -229,8 +229,8 @@ export class OrderService {
 			match: T = {},
 			sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 
-		if (orderStatus) match.orderStatus = orderStatus;
-		if (orderPaymentStatus) match.orderPaymentStatus = orderPaymentStatus;
+		if (orderStatus) match.orderStatus = { $in: orderStatus };
+		if (orderPaymentStatus) match.orderPaymentStatus = { $in: orderPaymentStatus };
 
 		const result = await this.orderModel
 			.aggregate([

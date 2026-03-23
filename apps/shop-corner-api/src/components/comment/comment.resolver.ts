@@ -25,7 +25,9 @@ export class CommentResolver {
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Comments> {
 		console.log('Query: getComments');
-		input.search.commentRefId = shapeIntoMongooseObjectId(input.search.commentRefId);
+		if (input.search.commentRefId) {
+			input.search.commentRefId = shapeIntoMongooseObjectId(input.search.commentRefId);
+		}
 
 		return await this.commentService.getComments(memberId, input);
 	}

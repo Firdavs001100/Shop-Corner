@@ -1,4 +1,4 @@
-import { Field, InputType, Int } from '@nestjs/graphql';
+import { Field, Float, InputType, Int } from '@nestjs/graphql';
 import { IsIn, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
 import type { ObjectId } from 'mongoose';
 import { CommentGroup } from '../../enums/comment.enum';
@@ -21,7 +21,7 @@ export class CommentInput {
 	commentRefId: ObjectId;
 
 	@IsOptional()
-	@Field(() => Int, { nullable: true })
+	@Field(() => Float, { nullable: true })
 	commentRating?: number;
 
 	memberId?: ObjectId;
@@ -29,9 +29,17 @@ export class CommentInput {
 
 @InputType()
 class CISearch {
-	@IsNotEmpty()
-	@Field(() => String)
-	commentRefId: ObjectId;
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	commentRefId?: ObjectId;
+
+	@IsOptional()
+	@Field(() => CommentGroup, { nullable: true })
+	commentGroup?: CommentGroup;
+
+	@IsOptional()
+	@Field(() => Float, { nullable: true })
+	commentRating?: number;
 }
 
 @InputType()
@@ -67,7 +75,7 @@ class ACISearch {
 	commentGroup?: CommentGroup;
 
 	@IsOptional()
-	@Field(() => Int, { nullable: true })
+	@Field(() => Float, { nullable: true })
 	commentRating?: number;
 }
 
