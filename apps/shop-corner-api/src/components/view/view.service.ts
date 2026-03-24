@@ -7,6 +7,7 @@ import { T } from '../../libs/types/common';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { OrdinaryInquiry } from '../../libs/dto/product/product.input';
 import { Products } from '../../libs/dto/product/product';
+import { lookupAuthMemberLiked } from '../../libs/config';
 
 @Injectable()
 export class ViewService {
@@ -52,6 +53,12 @@ export class ViewService {
 									},
 								},
 								{ $unwind: '$visitedProduct' },
+								lookupAuthMemberLiked(memberId, '$visitedProduct._id'),
+								{
+									$addFields: {
+										'visitedProduct.meLiked': '$meLiked',
+									},
+								},
 							],
 							metaCounter: [{ $count: 'total' }],
 						},

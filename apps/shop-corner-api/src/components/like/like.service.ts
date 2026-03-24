@@ -8,6 +8,7 @@ import { T } from '../../libs/types/common';
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { OrdinaryInquiry } from '../../libs/dto/product/product.input';
 import { Products } from '../../libs/dto/product/product';
+import { lookupAuthMemberLiked } from '../../libs/config';
 
 @Injectable()
 export class LikeService {
@@ -57,6 +58,12 @@ export class LikeService {
 						},
 					},
 					{ $unwind: '$favoriteProduct' },
+					lookupAuthMemberLiked(memberId, '$favoriteProduct._id'),
+					{
+						$addFields: {
+							'favoriteProduct.meLiked': '$meLiked',
+						},
+					},
 					{
 						$facet: {
 							list: [

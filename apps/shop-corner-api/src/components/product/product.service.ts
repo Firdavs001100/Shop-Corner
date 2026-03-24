@@ -93,12 +93,24 @@ export class ProductService {
 		if (categoryList && categoryList.length) match.productCategory = { $in: categoryList };
 		if (sizeList && sizeList.length) match.productSize = { $in: sizeList };
 		if (brandList && brandList.length) match.productBrand = { $in: brandList };
-		if (colorList && colorList.length) match.productColor = { $in: colorList };
+		if (colorList && colorList.length) {
+			match.productColor = {
+				$in: colorList.map((c) => new RegExp(`^${c}$`, 'i')),
+			};
+		}
 		if (dressStyleList && dressStyleList.length) match.productDressStyle = { $in: dressStyleList };
 
 		if (pricesRange) match.productPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
 
 		if (text) match.productName = { $regex: new RegExp(text, 'i') };
+	}
+
+	public async getProductBrands(): Promise<string[]> {
+		return await this.productModel
+			.distinct('productBrand', {
+				productStatus: ProductStatus.ACTIVE,
+			})
+			.exec();
 	}
 
 	public async getFavorites(memberId: ObjectId, input: OrdinaryInquiry): Promise<Products> {

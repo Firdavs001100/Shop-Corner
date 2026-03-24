@@ -10,7 +10,12 @@ import { shapeIntoMongooseObjectId } from '../../libs/config';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { ProductService } from './product.service';
 import { Product, Products } from '../../libs/dto/product/product';
-import { AllProductsInquiry, OrdinaryInquiry, ProductInput, ProductsInquiry } from '../../libs/dto/product/product.input';
+import {
+	AllProductsInquiry,
+	OrdinaryInquiry,
+	ProductInput,
+	ProductsInquiry,
+} from '../../libs/dto/product/product.input';
 import { ProductUpdate } from '../../libs/dto/product/product.update';
 
 @Resolver()
@@ -35,6 +40,14 @@ export class ProductResolver {
 		console.log('Query: getProducts');
 
 		return await this.productService.getProducts(memberId, input);
+	}
+
+	@UseGuards(WithoutGuard)
+	@Query(() => [String])
+	public async getProductBrands(): Promise<string[]> {
+		console.log('Query: getProductBrands');
+
+		return await this.productService.getProductBrands();
 	}
 
 	@UseGuards(AuthGuard)
