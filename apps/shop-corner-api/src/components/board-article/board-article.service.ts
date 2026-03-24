@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { BoardArticle, BoardArticles } from '../../libs/dto/board-article/board-article';
@@ -214,13 +214,21 @@ export class BoardArticleService {
 	}
 
 	public async removeBoardArticleByAdmin(articleId: ObjectId): Promise<BoardArticle> {
-		const search: T = {
-			_id: articleId,
-			articleStatus: BoardArticleStatus.DELETE,
-		};
+		const article = await this.boardArticleModel.findById(articleId).exec();
 
-		const result = await this.boardArticleModel.findOneAndDelete(search).exec();
-		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
+		if (!article) {
+			throw new NotFoundException('Article not found');
+		}
+
+		if (article.articleStatus !== BoardArticleStatus.DELETE) {
+			throw new BadRequestException('To permanently delete this article, you must first set its status to DELETED.');
+		}
+
+		const result = await this.boardArticleModel.findByIdAndDelete(articleId).exec();
+
+		if (!result) {
+			throw new InternalServerErrorException('Failed to remove article');
+		}
 
 		return result;
 	}
