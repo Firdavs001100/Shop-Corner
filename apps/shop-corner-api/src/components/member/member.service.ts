@@ -34,7 +34,8 @@ export class MemberService {
 		try {
 			const result = await this.memberModel.create(input);
 
-			result.accessToken = await this.authService.createToken(result);
+			result.accessToken = await this.authService.createAccessToken(result);
+			result.refreshToken = await this.authService.createRefreshToken(result);
 			return result;
 		} catch (err) {
 			console.log('Error, member.model.ts:', err);
@@ -56,7 +57,8 @@ export class MemberService {
 		const isMatch = await this.authService.comparePasswords(memberPassword, response.memberPassword);
 		if (!isMatch) throw new InternalServerErrorException(Message.WRONG_PASSWORD);
 
-		response.accessToken = await this.authService.createToken(response);
+		response.accessToken = await this.authService.createAccessToken(response);
+		response.refreshToken = await this.authService.createRefreshToken(response);
 		return response;
 	}
 
@@ -120,7 +122,8 @@ export class MemberService {
 
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 
-		result.accessToken = await this.authService.createToken(result);
+		result.accessToken = await this.authService.createAccessToken(result);
+		result.refreshToken = await this.authService.createRefreshToken(result);
 		return result;
 	}
 

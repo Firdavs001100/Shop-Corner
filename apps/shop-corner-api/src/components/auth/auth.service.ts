@@ -16,22 +16,32 @@ export class AuthService {
 		return await bcrypt.compare(password, hashedPassword);
 	}
 
-	public async createToken(member: Member): Promise<string> {
-		const payload: T = {};
-
-		Object.keys(member['_doc'] ? member['_doc'] : member).map((ele) => {
-			payload[`${ele}`] = member[`${ele}`];
-		});
-
+	public async createAccessToken(member: Member): Promise<string> {
+		const payload: T = { ...(member['_doc'] || member) };
 		delete payload.memberPassword;
 
-		return await this.jwtService.signAsync(payload);
+		return this.jwtService.sign(payload, {
+			secret: process.env.ACCESS_TOKEN_SECRET,
+			expiresIn: '15m',
+		});
+	}
+
+	public async createRefreshToken(member: Member): Promise<string> {
+		return this.jwtService.sign(
+			{ _id: member._id },
+			{
+				secret: process.env.REFRESH_TOKEN_SECRET,
+				expiresIn: '7d',
+			},
+		);
 	}
 
 	public async verifyToken(token: string): Promise<Member> {
-		const member = await this.jwtService.verifyAsync(token);
-		member._id = shapeIntoMongooseObjectId(member._id);
+		const member = await this.jwtService.verifyAsync(token, {
+			secret: process.env.ACCESS_TOKEN_SECRET,
+		});
 
+		member._id = shapeIntoMongooseObjectId(member._id);
 		return member;
 	}
 }
