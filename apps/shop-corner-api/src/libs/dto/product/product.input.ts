@@ -7,10 +7,9 @@ import { productSortOptions } from '../../config';
 
 @InputType()
 export class ProductInput {
-	@IsNotEmpty()
-	@Length(3, 100)
-	@Field(() => ProductStatus)
-	productStatus: ProductStatus;
+	@IsOptional()
+	@Field(() => ProductStatus, { nullable: true })
+	productStatus?: ProductStatus;
 
 	@IsNotEmpty()
 	@Length(3, 100)

@@ -1,5 +1,5 @@
 import { Field, InputType, Int, Float } from '@nestjs/graphql';
-import { IsArray, ArrayNotEmpty, IsInt, IsOptional, Length, Min } from 'class-validator';
+import { IsArray, ArrayNotEmpty, IsInt, IsOptional, Length, Min, IsNumber } from 'class-validator';
 import type { ObjectId } from 'mongoose';
 import { ProductCategory, ProductDressStyle, ProductSize, ProductStatus } from '../../enums/product.enum';
 
@@ -47,7 +47,8 @@ export class ProductUpdate {
 	productSize?: ProductSize[];
 
 	@IsOptional()
-	@Length(2, 50)
+	@IsArray()
+	@ArrayNotEmpty()
 	@Field(() => [String], { nullable: true })
 	productColor?: string[];
 
@@ -74,9 +75,9 @@ export class ProductUpdate {
 	productStockCount?: number;
 
 	@IsOptional()
-	@IsInt()
+	@IsNumber()
 	@Min(0)
-	@Field(() => Float, {nullable: true})
+	@Field(() => Float, { nullable: true })
 	productRating?: number;
 
 	@IsOptional()

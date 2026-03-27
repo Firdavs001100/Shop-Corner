@@ -7,7 +7,7 @@ import { StatisticModifier, T } from '../../libs/types/common';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewService } from '../view/view.service';
 import { Direction } from '../../libs/enums/common.enum';
-import { lookupAuthMemberLiked } from '../../libs/config';
+import { lookupAuthMemberLiked, shapeIntoMongooseObjectId } from '../../libs/config';
 import { LikeService } from '../like/like.service';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
@@ -27,7 +27,6 @@ import { OrderItem } from '../../libs/dto/order/order';
 export class ProductService {
 	constructor(
 		@InjectModel('Product') private readonly productModel: Model<Product>,
-		private readonly memberService: MemberService,
 		private readonly viewService: ViewService,
 		private readonly likeService: LikeService,
 	) {}
@@ -198,14 +197,17 @@ export class ProductService {
 	}
 
 	public async updateProductByAdmin(input: ProductUpdate): Promise<Product> {
-		if (input.productName) {
-			input.productSlug = slugify(input.productName, {
+		const { _id, productName } = input,
+			id = shapeIntoMongooseObjectId(_id),
+			search = { _id: id };
+		if (productName) {
+			input.productSlug = slugify(productName, {
 				lower: true,
 				strict: true,
 			});
 		}
 
-		const result = await this.productModel.findOneAndUpdate({ _id: input._id }, input, { new: true }).exec();
+		const result = await this.productModel.findOneAndUpdate(search, input, { new: true }).exec();
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 
 		return result;
