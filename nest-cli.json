@@ -4,7 +4,8 @@
 	"sourceRoot": "apps/shop-corner-api/src",
 	"compilerOptions": {
 		"deleteOutDir": true,
-		"webpack": false
+		"webpack": true,
+		"tsConfigPath": "apps/shop-corner-api/tsconfig.app.json"
 	},
 	"monorepo": true,
 	"root": "apps/shop-corner-api",

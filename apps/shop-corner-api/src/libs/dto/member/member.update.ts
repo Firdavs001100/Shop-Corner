@@ -26,22 +26,22 @@ export class MemberUpdate {
 	memberEmail?: string;
 
 	@IsOptional()
-	@Length(3, 12)
+	@Length(3, 30)
 	@Field(() => String, { nullable: true })
 	memberNick?: string;
 
 	@IsOptional()
-	@Length(5, 20)
+	@Length(5, 40)
 	@Field(() => String, { nullable: true })
 	memberPassword?: string;
 
 	@IsOptional()
-	@Length(5, 20)
+	@Length(5, 40)
 	@Field(() => String, { nullable: true })
 	memberNewPassword?: string;
 
 	@IsOptional()
-	@Length(3, 100)
+	@Length(0, 200)
 	@Field(() => String, { nullable: true })
 	memberFullName?: string;
 
@@ -57,5 +57,5 @@ export class MemberUpdate {
 	@Field(() => String, { nullable: true })
 	memberDesc?: string;
 
-	delatedAt?: Date;
+	deletedAt?: Date;
 }
