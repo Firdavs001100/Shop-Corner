@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  shop-corner-api:
+    container_name: shop-corner-api
+    restart: always
+    image: node:20.20.0
+
+    ports:
+      - '4001:3007'
+
+    volumes:
+      - ./:/usr/src/shop-corner
+
+    working_dir: /usr/src/shop-corner
+
+    command: bash -c "npm install && npm run build && npm run start:prod"
+
+    networks:
+      - monorepo-network
+
+  shop-corner-batch:
+    container_name: shop-corner-batch
+    restart: unless-stopped
+    image: node:20.20.0
+
+    ports:
+      - '4002:3008'
+
+    volumes:
+      - ./:/usr/src/shop-corner
+
+    working_dir: /usr/src/shop-corner
+
+    command: bash -c "npm install && npm run build && npm run start:prod:batch"
+
+    networks:
+      - monorepo-network
+
+networks:
+  monorepo-network:
+    driver: bridge

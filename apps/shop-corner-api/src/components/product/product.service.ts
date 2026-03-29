@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { MemberService } from '../member/member.service';
 import { Message } from '../../libs/Errors';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { ViewGroup } from '../../libs/enums/view.enum';
@@ -201,10 +200,28 @@ export class ProductService {
 			id = shapeIntoMongooseObjectId(_id),
 			search = { _id: id };
 		if (productName) {
-			input.productSlug = slugify(productName, {
-				lower: true,
-				strict: true,
-			});
+			const existing = await this.productModel.findById(id).lean();
+
+			if (existing?.productName !== productName) {
+				const baseSlug = slugify(productName, {
+					lower: true,
+					strict: true,
+				});
+
+				let slug = baseSlug;
+				let count = 1;
+
+				while (
+					await this.productModel.exists({
+						productSlug: slug,
+						_id: { $ne: id },
+					})
+				) {
+					slug = `${baseSlug}-${count++}`;
+				}
+
+				input.productSlug = slug;
+			}
 		}
 
 		const result = await this.productModel.findOneAndUpdate(search, input, { new: true }).exec();
