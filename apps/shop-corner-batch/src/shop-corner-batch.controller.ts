@@ -11,11 +11,13 @@ export class ShopCornerBatchController {
 
 	@Timeout(1000)
 	public async handleTimeout() {
-		this.logger.debug('BATCH SERVER READY!');
+		this.logger.debug('BATCH SERVER IS READY!');
 	}
 
-	@Cron('00 * * * * *', { name: BATCH_ROLLBACK })
+	@Cron('00 00 00 * * *', { name: BATCH_ROLLBACK })
 	public async batchRollback() {
+		console.log('This runs every day at 00:00:00 AM');
+
 		try {
 			this.logger['context'] = BATCH_ROLLBACK;
 			this.logger.debug('EXECUTED!');
@@ -25,8 +27,10 @@ export class ShopCornerBatchController {
 		}
 	}
 
-	@Cron('20 * * * * *', { name: BATCH_TOP_PRODUCTS })
+	@Cron('30 00 00 * * *', { name: BATCH_TOP_PRODUCTS })
 	public async batchTopProducts() {
+		console.log('This runs every day at 00:00:30 AM');
+
 		try {
 			this.logger['context'] = BATCH_TOP_PRODUCTS;
 			this.logger.debug('EXECUTED!');
